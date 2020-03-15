@@ -1,0 +1,4 @@
+rootProject.name = 'churchapi'
+include 'app'
+include 'churchapilib'
+
