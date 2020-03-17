@@ -61,8 +61,12 @@ public class ChurchApi extends BaseApi<Church> {
 
         criteria.setName(nameLike);
 
-        if ((id == null) && (hasSuperRole() == false)) {
-            criteria.setId("NOTALLOWED");
+        if (id == null) {
+            apiCaller.getMemberOf().forEach(churchId -> {
+                if (id == null) {
+                    id = churchId;
+                }
+            });
         }
 
         if (readAllowed(id, this::hasSuperRole)) {
