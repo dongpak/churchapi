@@ -4,6 +4,7 @@ package com.churchclerk.churchapi;
 
 
 import com.churchclerk.baseapi.BaseApi;
+import com.churchclerk.baseapi.model.ApiCaller;
 import com.churchclerk.churchapi.entity.ChurchEntity;
 import com.churchclerk.churchapi.model.Church;
 import com.churchclerk.churchapi.service.ChurchService;
@@ -18,11 +19,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+import java.security.Principal;
 import java.util.Date;
 import java.util.UUID;
 
@@ -51,6 +54,7 @@ public class ChurchApiTest {
 
 
 	private SecurityToken	testToken;
+	private Principal 		testPrincipal;
 	private Date			testDate;
 	private String			testId;
 	private Church 			testResource;
@@ -71,6 +75,12 @@ public class ChurchApiTest {
 			throw new RuntimeException("Error creating security token");
 		};
 
+		testPrincipal   = new UsernamePasswordAuthenticationToken(null, testToken, null);
+
+		Mockito.when(testHttpRequest.getHeader(HEADER_AUTHORIZATION)).thenReturn(TOKEN_PREFIX+testToken.getJwt());
+		Mockito.when(testHttpRequest.getRemoteAddr()).thenReturn(LOCAL_ADDRESS);
+		Mockito.when(testHttpRequest.getUserPrincipal()).thenReturn(testPrincipal);
+
 		ReflectionTestUtils.setField(testObject, "secret", testSecret);
 	}
 
@@ -87,7 +97,7 @@ public class ChurchApiTest {
 		testToken = new SecurityToken();
 
 		testToken.setId(id + "|");
-		testToken.setRoles(BaseApi.Role.SUPER.name());
+		testToken.setRoles(ApiCaller.Role.SUPER.name());
 		testToken.setLocation(location);
 		testToken.setSecret(testSecret);
 
@@ -104,8 +114,6 @@ public class ChurchApiTest {
 	public void testGetResources() throws Exception {
 		ReflectionTestUtils.setField(testObject, "sortBy", "street");
 
-		Mockito.when(testHttpRequest.getHeader(HEADER_AUTHORIZATION)).thenReturn(TOKEN_PREFIX+testToken.getJwt());
-		Mockito.when(testHttpRequest.getRemoteAddr()).thenReturn(LOCAL_ADDRESS);
 		Mockito.when(testService.getResources(null, null)).thenReturn(null);
 
 		Response response = testObject.getResources();
@@ -119,8 +127,6 @@ public class ChurchApiTest {
 
 		ReflectionTestUtils.setField(testObject, "id", testId);
 
-		Mockito.when(testHttpRequest.getHeader(HEADER_AUTHORIZATION)).thenReturn(TOKEN_PREFIX+testToken.getJwt());
-		Mockito.when(testHttpRequest.getRemoteAddr()).thenReturn(LOCAL_ADDRESS);
 		Mockito.when(testService.getResource(testId)).thenReturn(null);
 
 		Response response = testObject.getResource();
@@ -130,10 +136,10 @@ public class ChurchApiTest {
 
 	@Test
 	public void testCreateResource() throws Exception {
-		Mockito.when(testHttpRequest.getHeader(HEADER_AUTHORIZATION)).thenReturn(TOKEN_PREFIX+testToken.getJwt());
-		Mockito.when(testHttpRequest.getRemoteAddr()).thenReturn(LOCAL_ADDRESS);
+
 		Mockito.when(testService.createResource(testResource)).thenReturn(testResource);
 
+		testResource.setId(null);
 		Response response = testObject.createResource(testResource);
 
 		Assertions.assertThat(response).isNotNull();
@@ -156,8 +162,6 @@ public class ChurchApiTest {
 
 		ReflectionTestUtils.setField(testObject, "id", testId);
 
-		Mockito.when(testHttpRequest.getHeader(HEADER_AUTHORIZATION)).thenReturn(TOKEN_PREFIX+testToken.getJwt());
-		Mockito.when(testHttpRequest.getRemoteAddr()).thenReturn(LOCAL_ADDRESS);
 		Mockito.when(testService.getResource(testId)).thenReturn(testResource);
 		Mockito.when(testService.updateResource(testResource)).thenReturn(testResource);
 
@@ -178,8 +182,6 @@ public class ChurchApiTest {
 	public void testUpdateResourceNotExist() throws Exception {
 		ReflectionTestUtils.setField(testObject, "id", testId);
 
-		Mockito.when(testHttpRequest.getHeader(HEADER_AUTHORIZATION)).thenReturn(TOKEN_PREFIX+testToken.getJwt());
-		Mockito.when(testHttpRequest.getRemoteAddr()).thenReturn(LOCAL_ADDRESS);
 		Mockito.when(testService.updateResource(testResource)).thenReturn(null);
 
 		Response response = testObject.updateResource(testResource);
@@ -191,8 +193,6 @@ public class ChurchApiTest {
 	public void testDeleteResource() throws Exception {
 		ReflectionTestUtils.setField(testObject, "id", testId);
 
-		Mockito.when(testHttpRequest.getHeader(HEADER_AUTHORIZATION)).thenReturn(TOKEN_PREFIX+testToken.getJwt());
-		Mockito.when(testHttpRequest.getRemoteAddr()).thenReturn(LOCAL_ADDRESS);
 		Mockito.when(testService.deleteResource(testId)).thenReturn(testResource);
 
 		Response response = testObject.deleteResource();

@@ -50,8 +50,6 @@ public class Church extends BaseModel {
      */
     public void copyNonNulls(Church source) {
         super.copyNonNulls(source);
-        if (source.getName() != null) {
-            setName(source.getName());
-        }
+        copy(source.getName(), this::setName);
     }
 }

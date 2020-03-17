@@ -87,7 +87,7 @@ public class ChurchService {
 
 		ChurchEntity entity = optional.get();
 
-		entity.copy(resource);
+		entity.copyNonNulls(resource);
 		return storage.save(entity);
 	}
 
