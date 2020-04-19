@@ -39,5 +39,11 @@
 			<dropTable tableName="church"/>
 		</rollback>
 	</changeSet>
-
+    <changeSet id="1" author="dongp">
+        <addColumn tableName="church">
+            <column name="contact_id" type="uuid">
+                <constraints foreignKeyName="fk_church_contact_id" referencedTableName="contact" referencedColumnNames="id"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

@@ -6,6 +6,7 @@ package com.churchclerk.churchapi;
 import com.churchclerk.baseapi.BaseApi;
 import com.churchclerk.baseapi.model.ApiCaller;
 import com.churchclerk.churchapi.model.Church;
+import com.churchclerk.churchapi.service.ChurchContactService;
 import com.churchclerk.churchapi.service.ChurchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,9 @@ public class ChurchApi extends BaseApi<Church> {
     @Autowired
     private ChurchService service;
 
+    @Autowired
+    private ChurchContactService    serviceLevel1;
+
     /**
      *
      */
@@ -46,7 +50,9 @@ public class ChurchApi extends BaseApi<Church> {
 
     @Override
     protected Page<? extends Church> doGet(Pageable pageable) {
-
+        if (detailLevel > 0) {
+            return serviceLevel1.getResources(pageable, createCriteria());
+        }
         return service.getResources(pageable, createCriteria());
     }
 
@@ -79,6 +85,7 @@ public class ChurchApi extends BaseApi<Church> {
             criteria.setId("NOTALLOWED");
         }
 
+        logger.info("id="+criteria.getId());
         return criteria;
     }
 
@@ -88,7 +95,7 @@ public class ChurchApi extends BaseApi<Church> {
             throw new BadRequestException("Church id cannot be empty");
         }
 
-        Church resource = service.getResource(id);
+        Church resource = detailLevel > 0 ? serviceLevel1.getResource(id) : service.getResource(id);
 
         if ((resource == null) || (readAllowed(resource.getId()) == false)) {
             throw new NotFoundException();
@@ -117,7 +124,7 @@ public class ChurchApi extends BaseApi<Church> {
         resource.setUpdatedBy(apiCaller.getUserid());
         resource.setUpdatedDate(new Date());
 
-        return service.createResource(resource);
+        return serviceLevel1.createResource(resource);
     }
 
     @Override
@@ -141,7 +148,7 @@ public class ChurchApi extends BaseApi<Church> {
         resource.setUpdatedBy(apiCaller.getUserid());
         resource.setUpdatedDate(new Date());
 
-        return service.updateResource(resource);
+        return serviceLevel1.updateResource(resource);
     }
 
     @Override
@@ -154,6 +161,6 @@ public class ChurchApi extends BaseApi<Church> {
             throw new ForbiddenException();
         }
 
-        return service.deleteResource(id);
+        return serviceLevel1.deleteResource(id);
     }
 }

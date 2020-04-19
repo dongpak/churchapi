@@ -3,8 +3,10 @@
  */
 package com.churchclerk.churchapi.service;
 
+import com.churchclerk.churchapi.entity.ChurchContactEntity;
 import com.churchclerk.churchapi.entity.ChurchEntity;
 import com.churchclerk.churchapi.model.Church;
+import com.churchclerk.contactapi.model.Contact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +41,19 @@ public class ChurchService {
 
 		Page<ChurchEntity> page = storage.findAll(new ChurchResourceSpec(criteria), pageable);
 
+		if (page != null) {
+			//page.forEach(this::moveContact);
+		}
 		return page;
+	}
+
+	private void moveContact(ChurchEntity entity) {
+		if (entity.getContactId() != null) {
+			Contact resource = new Contact();
+
+			resource.setId(entity.getContactId());
+			entity.setContact(resource);
+		}
 	}
 
 	/**
@@ -49,10 +63,14 @@ public class ChurchService {
 	 */
 	public Church getResource(String id) {
 
-		Optional<ChurchEntity> entity = storage.findById(id);
+		Optional<ChurchEntity> optional = storage.findById(id);
 
-		checkResourceNotFound(id, entity);
-		return entity.get();
+		checkResourceNotFound(id, optional);
+
+		ChurchEntity	entity = optional.get();
+
+		//moveContact(entity);
+		return entity;
 	}
 
 	private void checkResourceNotFound(String id, Optional<ChurchEntity> optional) {

@@ -4,14 +4,18 @@
 package com.churchclerk.churchapi.model;
 
 import com.churchclerk.baseapi.model.BaseModel;
+import com.churchclerk.contactapi.model.Contact;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.Objects;
 
 /**
  *
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Church extends BaseModel {
-    private String name;
+    private String  name;
+    private Contact contact;
 
     public String getName() {
         return name;
@@ -21,18 +25,27 @@ public class Church extends BaseModel {
         this.name = name;
     }
 
+    public Contact getContact() {
+        return contact;
+    }
+
+    public void setContact(Contact contact) {
+        this.contact = contact;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Church)) return false;
         if (!super.equals(o)) return false;
-        Church model = (Church) o;
-        return Objects.equals(name, model.name);
+        Church church = (Church) o;
+        return Objects.equals(name, church.name) &&
+                Objects.equals(contact, church.contact);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name);
+        return Objects.hash(super.hashCode(), name, contact);
     }
 
     /**

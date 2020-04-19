@@ -57,6 +57,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     implementation 'com.churchclerk:baseapilib:1.0'
+    implementation 'com.churchclerk:contactapilib:1.0'
     implementation project(':churchapilib')
 
     runtimeOnly 'mysql:mysql-connector-java'
