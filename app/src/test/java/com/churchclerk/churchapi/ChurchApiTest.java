@@ -7,6 +7,7 @@ import com.churchclerk.baseapi.BaseApi;
 import com.churchclerk.baseapi.model.ApiCaller;
 import com.churchclerk.churchapi.entity.ChurchEntity;
 import com.churchclerk.churchapi.model.Church;
+import com.churchclerk.churchapi.service.ChurchContactService;
 import com.churchclerk.churchapi.service.ChurchService;
 import com.churchclerk.securityapi.SecurityApi;
 import com.churchclerk.securityapi.SecurityToken;
@@ -47,7 +48,10 @@ public class ChurchApiTest {
 	protected HttpServletRequest	testHttpRequest;
 
 	@Mock
-	private ChurchService testService;
+	private ChurchService 			testService;
+
+	@Mock
+	private ChurchContactService	testServiceLevel1;
 
 	@Value("${jwt.secret}")
 	private String					testSecret;
@@ -65,6 +69,7 @@ public class ChurchApiTest {
 
 		Mockito.clearInvocations(testHttpRequest);
 		Mockito.clearInvocations(testService);
+		Mockito.clearInvocations(testServiceLevel1);
 
 		testDate		= new Date();
 		testId			= UUID.randomUUID().toString();
@@ -137,7 +142,7 @@ public class ChurchApiTest {
 	@Test
 	public void testCreateResource() throws Exception {
 
-		Mockito.when(testService.createResource(testResource)).thenReturn(testResource);
+		Mockito.when(testServiceLevel1.createResource(testResource)).thenReturn(testResource);
 
 		testResource.setId(null);
 		Response response = testObject.createResource(testResource);
@@ -162,8 +167,8 @@ public class ChurchApiTest {
 
 		ReflectionTestUtils.setField(testObject, "id", testId);
 
-		Mockito.when(testService.getResource(testId)).thenReturn(testResource);
-		Mockito.when(testService.updateResource(testResource)).thenReturn(testResource);
+		Mockito.when(testServiceLevel1.getResource(testId)).thenReturn(testResource);
+		Mockito.when(testServiceLevel1.updateResource(testResource)).thenReturn(testResource);
 
 		testResource.setActive(false);
 		Response response = testObject.updateResource(testResource);
@@ -182,7 +187,7 @@ public class ChurchApiTest {
 	public void testUpdateResourceNotExist() throws Exception {
 		ReflectionTestUtils.setField(testObject, "id", testId);
 
-		Mockito.when(testService.updateResource(testResource)).thenReturn(null);
+		Mockito.when(testServiceLevel1.updateResource(testResource)).thenReturn(null);
 
 		Response response = testObject.updateResource(testResource);
 
@@ -193,7 +198,7 @@ public class ChurchApiTest {
 	public void testDeleteResource() throws Exception {
 		ReflectionTestUtils.setField(testObject, "id", testId);
 
-		Mockito.when(testService.deleteResource(testId)).thenReturn(testResource);
+		Mockito.when(testServiceLevel1.deleteResource(testId)).thenReturn(testResource);
 
 		Response response = testObject.deleteResource();
 
