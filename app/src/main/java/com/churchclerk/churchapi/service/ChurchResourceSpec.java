@@ -67,4 +67,16 @@ public class ChurchResourceSpec implements Specification<ChurchEntity> {
             predicates.add(predicate);
         }
     }
+
+    private void addPredicate(CriteriaBuilder criteriaBuilder, Root<ChurchEntity> root, String field, UUID value, List<Predicate> predicates) {
+        Predicate predicate = null;
+
+        if (value != null) {
+            predicate = criteriaBuilder.equal(root.get(field), value);
+        }
+
+        if (predicate != null) {
+            predicates.add(predicate);
+        }
+    }
 }

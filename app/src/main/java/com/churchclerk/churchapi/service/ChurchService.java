@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
 import java.util.Optional;
+import java.util.UUID;
 
 
 /**
@@ -63,7 +64,7 @@ public class ChurchService {
 	 */
 	public Church getResource(String id) {
 
-		Optional<ChurchEntity> optional = storage.findById(id);
+		Optional<ChurchEntity> optional = storage.findById(UUID.fromString(id));
 
 		checkResourceNotFound(id, optional);
 
@@ -101,7 +102,7 @@ public class ChurchService {
 	public Church updateResource(Church resource) {
 		Optional<ChurchEntity> optional = storage.findById(resource.getId());
 
-		checkResourceNotFound(resource.getId(), optional);
+		checkResourceNotFound(resource.getId().toString(), optional);
 
 		ChurchEntity entity = optional.get();
 
@@ -117,11 +118,11 @@ public class ChurchService {
 	 * @return
 	 */
 	public Church deleteResource(String id) {
-		Optional<ChurchEntity> optional = storage.findById(id);
+		Optional<ChurchEntity> optional = storage.findById(UUID.fromString(id));
 
 		checkResourceNotFound(id, optional);
 
-		storage.deleteById(id);
+		storage.deleteById(UUID.fromString(id));
 		return optional.get();
 	}
 }

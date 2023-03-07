@@ -5,6 +5,9 @@ package com.churchclerk.churchapi.entity;
 
 import com.churchclerk.contactapi.entity.ContactEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
@@ -16,6 +19,9 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="church")
+@Setter
+@SuperBuilder
+@NoArgsConstructor
 public class ChurchContactEntity extends BaseChurchEntity {
 
 	private ContactEntity contactEntity;
@@ -26,10 +32,6 @@ public class ChurchContactEntity extends BaseChurchEntity {
 	@JoinColumn(name = "contact_id", nullable = true)
 	public ContactEntity getContactEntity() {
 		return contactEntity;
-	}
-
-	public void setContactEntity(ContactEntity contactEntity) {
-		this.contactEntity = contactEntity;
 	}
 
 }

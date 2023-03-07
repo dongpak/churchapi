@@ -8,6 +8,7 @@ import com.churchclerk.baseapi.model.ApiCaller;
 import com.churchclerk.churchapi.model.Church;
 import com.churchclerk.churchapi.service.ChurchContactService;
 import com.churchclerk.churchapi.service.ChurchService;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,8 @@ import java.util.UUID;
  */
 @Component
 @Path("/church")
+@Slf4j
 public class ChurchApi extends BaseApi<Church> {
-
-    private static Logger logger = LoggerFactory.getLogger(ChurchApi.class);
 
     @QueryParam("name")
     protected String nameLike;
@@ -43,16 +43,16 @@ public class ChurchApi extends BaseApi<Church> {
      *
      */
     public ChurchApi() {
-        super(logger, Church.class);
+        super(Church.class);
         setReadRoles(ApiCaller.Role.ADMIN, ApiCaller.Role.CLERK, ApiCaller.Role.OFFICIAL, ApiCaller.Role.MEMBER, ApiCaller.Role.NONMEMBER);
         setUpdateRoles(ApiCaller.Role.ADMIN);
     }
 
     @Override
     protected Page<? extends Church> doGet(Pageable pageable) {
-        if (detailLevel > 0) {
-            return serviceLevel1.getResources(pageable, createCriteria());
-        }
+//        if (detailLevel > 0) {
+//            return serviceLevel1.getResources(pageable, createCriteria());
+//        }
         return service.getResources(pageable, createCriteria());
     }
 
@@ -77,15 +77,15 @@ public class ChurchApi extends BaseApi<Church> {
 
         if (readAllowed(id, this::hasSuperRole)) {
             if (id != null) {
-                criteria.setId(id);
+                criteria.setId(UUID.fromString(id));
             }
         }
         else {
             // force return of empty array
-            criteria.setId("NOTALLOWED");
+            criteria.setId(null);
         }
 
-        logger.info("id="+criteria.getId());
+        log.info("id="+criteria.getId());
         return criteria;
     }
 
@@ -95,9 +95,10 @@ public class ChurchApi extends BaseApi<Church> {
             throw new BadRequestException("Church id cannot be empty");
         }
 
-        Church resource = detailLevel > 0 ? serviceLevel1.getResource(id) : service.getResource(id);
+//        Church resource = detailLevel > 0 ? serviceLevel1.getResource(id) : service.getResource(id);
+        Church resource = service.getResource(id);
 
-        if ((resource == null) || (readAllowed(resource.getId()) == false)) {
+        if ((resource == null) || (readAllowed(resource.getId().toString()) == false)) {
             throw new NotFoundException();
         }
 
@@ -114,26 +115,21 @@ public class ChurchApi extends BaseApi<Church> {
             throw new BadRequestException("Church's name cannot be null");
         }
 
-        if (createAllowed(resource.getId(), this::hasSuperRole) == false) {
+        if (createAllowed(null, this::hasSuperRole) == false) {
             throw new ForbiddenException();
         }
 
-        resource.setId(UUID.randomUUID().toString());
-        resource.setCreatedBy(apiCaller.getUserid());
-        resource.setCreatedDate(new Date());
-        resource.setUpdatedBy(apiCaller.getUserid());
-        resource.setUpdatedDate(new Date());
-
+        resource.setId(UUID.randomUUID());
         return serviceLevel1.createResource(resource);
     }
 
     @Override
     protected Church doUpdate(Church resource) {
-        if ((id == null) || (id.isEmpty()) || (resource.getId() == null) || (resource.getId().isEmpty())) {
+        if ((id == null) || (id.isEmpty()) || (resource.getId() == null)) {
             throw new BadRequestException("Church id cannot be empty");
         }
 
-        if (resource.getId().equals(id) == false) {
+        if (resource.getId().toString().equals(id) == false) {
             throw new BadRequestException("Church id does not match");
         }
 
@@ -144,9 +140,6 @@ public class ChurchApi extends BaseApi<Church> {
         if (updateAllowed(id) == false) {
             throw new ForbiddenException();
         }
-
-        resource.setUpdatedBy(apiCaller.getUserid());
-        resource.setUpdatedDate(new Date());
 
         return serviceLevel1.updateResource(resource);
     }

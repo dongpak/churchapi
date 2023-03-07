@@ -11,6 +11,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ChurchContactResourceSpec implements Specification<ChurchContactEntity> {
 
@@ -57,6 +58,18 @@ public class ChurchContactResourceSpec implements Specification<ChurchContactEnt
     }
 
     private void addPredicate(CriteriaBuilder criteriaBuilder, Root<ChurchContactEntity> root, String field, Boolean value, List<Predicate> predicates) {
+        Predicate predicate = null;
+
+        if (value != null) {
+            predicate = criteriaBuilder.equal(root.get(field), value);
+        }
+
+        if (predicate != null) {
+            predicates.add(predicate);
+        }
+    }
+
+    private void addPredicate(CriteriaBuilder criteriaBuilder, Root<ChurchContactEntity> root, String field, UUID value, List<Predicate> predicates) {
         Predicate predicate = null;
 
         if (value != null) {
