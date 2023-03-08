@@ -27,7 +27,7 @@ import java.net.Inet4Address;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles(profiles = {"test"})
-@AutoConfigureEmbeddedDatabase
+@AutoConfigureEmbeddedDatabase(type = AutoConfigureEmbeddedDatabase.DatabaseType.POSTGRES)
 public class ChurchApiApplicationTest {
 
 	private static final String 	TOKEN_PREFIX 	= "Bearer ";

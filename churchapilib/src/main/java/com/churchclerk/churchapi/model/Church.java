@@ -7,6 +7,7 @@ import com.churchclerk.baseapi.model.BaseModel;
 import com.churchclerk.contactapi.model.Contact;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -17,6 +18,7 @@ import java.util.Objects;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
+@EqualsAndHashCode(callSuper=true)
 @SuperBuilder
 @NoArgsConstructor
 public class Church extends BaseModel {

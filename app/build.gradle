@@ -43,6 +43,7 @@ dependencies {
     }
     testImplementation libs.zonkytest
 //    testImplementation 'io.zonky.test:embedded-postgres:2.0.3'
+    testImplementation('com.h2database:h2')
     testImplementation('com.google.code.gson:gson')
     testImplementation(libs.securityapi)
 }
